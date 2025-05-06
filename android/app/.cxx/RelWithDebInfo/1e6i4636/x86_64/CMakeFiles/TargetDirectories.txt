@@ -1,0 +1,2 @@
+/Users/aswani/StudioProjects/dyd/android/app/.cxx/RelWithDebInfo/1e6i4636/x86_64/CMakeFiles/edit_cache.dir
+/Users/aswani/StudioProjects/dyd/android/app/.cxx/RelWithDebInfo/1e6i4636/x86_64/CMakeFiles/rebuild_cache.dir

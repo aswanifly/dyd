@@ -1,0 +1,2 @@
+/Users/aswani/StudioProjects/dyd/android/app/.cxx/Debug/2e553f6h/x86/CMakeFiles/edit_cache.dir
+/Users/aswani/StudioProjects/dyd/android/app/.cxx/Debug/2e553f6h/x86/CMakeFiles/rebuild_cache.dir
