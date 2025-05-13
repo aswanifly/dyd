@@ -103,40 +103,51 @@ class ShopByCatHomeWidget extends StatelessWidget {
     );
   }
 
-  Widget buildCategoryIconsWidget(
-      {required String name,
-      required String imagePath,
-      required Color gradColor1,
-      required Color gradColor2}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          height: 60,
-          width: 60,
-          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          decoration: BoxDecoration(
+  Widget buildCategoryIconsWidget({
+    required String name,
+    required String imagePath,
+    required Color gradColor1,
+    required Color gradColor2,
+  }) {
+    return SizedBox(
+      width: 70, // Constrained width
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 60,
+            width: 60,
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              gradient: LinearGradient(colors: [gradColor1, gradColor2])),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: SvgPicture.asset(
-              imagePath,
-              height: 25,
-              width: 35,
+              gradient: LinearGradient(colors: [gradColor1, gradColor2]),
+            ),
+            child: Center(
+              child: SvgPicture.asset(
+                imagePath,
+                height: 25,
+                width: 25,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
-        ),
-        Text(
-          name,
-          style: TypoBlack.black50012,
-          overflow: TextOverflow.ellipsis,
-        )
-      ],
+          SizedBox(
+            height: 32,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                name,
+                style: TypoBlack.black50012,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
-
 // void fGetValuesFromMap(String value){
 //   List<Map<String, dynamic>> categoryListIcons = [
 //     {
