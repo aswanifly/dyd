@@ -2,11 +2,25 @@ import 'package:dyd/core/config/spacing/static_spacing_helper.dart';
 import 'package:dyd/core/config/theme/app_palette.dart';
 import 'package:dyd/core/typo/black_typo.dart';
 import 'package:dyd/core/widget/app-bar-widget/app-bar-widget.dart';
+import 'package:dyd/feature/product/controller/product_controller.dart';
 import 'package:dyd/feature/product/widget/wishlist_product_card_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class WishlistProductScreen extends StatelessWidget {
+class WishlistProductScreen extends StatefulWidget {
   const WishlistProductScreen({super.key});
+
+  @override
+  State<WishlistProductScreen> createState() => _WishlistProductScreenState();
+}
+
+class _WishlistProductScreenState extends State<WishlistProductScreen> {
+  ProductController controller = Get.put(ProductController());
+  @override
+  void initState() {
+    controller.fGetWishList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,47 +33,83 @@ class WishlistProductScreen extends StatelessWidget {
       "https://cdn.pixabay.com/photo/2016/11/18/17/46/house-1836070_1280.jpg",
     ];
     return Scaffold(
-      appBar: GradientAppBar(
-        centerTitle: true,
-        title: Text("Wishlist"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10,
-          children: [
-            // Row(
-            //   crossAxisAlignment: CrossAxisAlignment.center,
-            //   children: [
-            //     buildFilterWidget("Sort", AppPalette.yellow),
-            //     Spacer(),
-            //     buildFilterWidget("Price", AppPalette.lightGrey2),
-            //     Spacing.horizontalSpace(10),
-            //     buildFilterWidget(
-            //         "Filters", AppPalette.lightGrey2, Icons.filter_list),
-            //   ],
-            // ),
-            Text("Popular Now", style: TypoBlack.black70018),
-            Flexible(
-              child: GridView.builder(
-                  itemCount: productList.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 8, // Adjust spacing if needed
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 0.65, // Adjust aspect ratio if needed
-                  ),
-                  itemBuilder: (context, index) => WishlistProductCardWidget(
-                        productImage: productList[index],
-                        productName: "Phone",
-                      )),
-            )
-          ],
+        appBar: GradientAppBar(
+          centerTitle: true,
+          title: Text("Wishlist"),
         ),
-      ),
-    );
+        body: Obx(() {
+          if (controller.kWishList.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.favorite_border,
+                    size: 80,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "No favorites yet!",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Add items to your favorites to see them here.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black38,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          }
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              children: [
+                // Row(
+                //   crossAxisAlignment: CrossAxisAlignment.center,
+                //   children: [
+                //     buildFilterWidget("Sort", AppPalette.yellow),
+                //     Spacer(),
+                //     buildFilterWidget("Price", AppPalette.lightGrey2),
+                //     Spacing.horizontalSpace(10),
+                //     buildFilterWidget(
+                //         "Filters", AppPalette.lightGrey2, Icons.filter_list),
+                //   ],
+                // ),
+                Text("Popular Now", style: TypoBlack.black70018),
+                Flexible(
+                  child: GridView.builder(
+                      itemCount: controller.kWishList.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 8, // Adjust spacing if needed
+                        crossAxisSpacing: 8,
+                        childAspectRatio: 0.65, // Adjust aspect ratio if needed
+                      ),
+                      itemBuilder: (context, index) {
+                        final product = controller.kWishList[index];
+                        return WishlistProductCardWidget(
+                          wishListProductModel: product,
+                        );
+                      }),
+                ),
+              ],
+            ),
+          );
+        }));
   }
 
   Card buildFilterWidget(String name, Color color,

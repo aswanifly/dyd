@@ -2,7 +2,7 @@ class ProductDetailModel {
   ProductDetailModel(
       {required this.id,
       required this.category,
-      required this.image,
+      required this.images,
       required this.productName,
       required this.basePrice,
       required this.salePrice,
@@ -15,11 +15,12 @@ class ProductDetailModel {
       required this.createdAt,
       required this.updatedAt,
       this.qty = 0,
+      this.isWishlisted = false,
       this.isAddedToCard = false});
 
   final String id;
   final Category? category;
-  final String image;
+  final List<String> images;
   final String productName;
   final String basePrice;
   final String salePrice;
@@ -33,6 +34,7 @@ class ProductDetailModel {
   final String updatedAt;
   final int qty;
   final bool isAddedToCard;
+  final bool isWishlisted;
 
   ProductDetailModel copyWith({
     String? id,
@@ -51,11 +53,12 @@ class ProductDetailModel {
     String? updatedAt,
     int? qty,
     bool? isAddedToCard,
+    bool? isWishlisted,
   }) {
     return ProductDetailModel(
       id: id ?? this.id,
       category: category ?? this.category,
-      image: image ?? this.image,
+      images: images ?? this.images,
       productName: productName ?? this.productName,
       basePrice: basePrice ?? this.basePrice,
       salePrice: salePrice ?? this.salePrice,
@@ -69,27 +72,31 @@ class ProductDetailModel {
       updatedAt: updatedAt ?? this.updatedAt,
       isAddedToCard: isAddedToCard ?? this.isAddedToCard,
       qty: qty ?? this.qty,
+      isWishlisted: isWishlisted ?? this.isWishlisted,
     );
   }
 
   factory ProductDetailModel.fromJson(Map<String, dynamic> json) {
     return ProductDetailModel(
-      id: json["_id"] ?? "",
-      category:
-          json["category"] == null ? null : Category.fromJson(json["category"]),
-      image: json["image"] ?? "",
-      productName: json["productName"] ?? "",
-      basePrice: (json["basePrice"] ?? 0).toString(),
-      salePrice: (json["salePrice"] ?? 0).toString(),
-      quantity: (json["quantity"] ?? 0),
-      description: json["description"] ?? "",
-      discount: (json["discount"] ?? 0).toString(),
-      isActive: json["isActive"] ?? false,
-      admin: json["admin"] ?? "",
-      isDeleted: json["isDeleted"] ?? false,
-      createdAt: json["createdAt"] ?? "",
-      updatedAt: json["updatedAt"] ?? "",
-    );
+        id: json["_id"] ?? "",
+        category: json["category"] == null
+            ? null
+            : Category.fromJson(json["category"]),
+        images: json["images"] != null || json["images"] != []
+            ? List<String>.from(json["images"])
+            : [],
+        productName: json["productName"] ?? "",
+        basePrice: (json["basePrice"] ?? 0).toString(),
+        salePrice: (json["salePrice"] ?? 0).toString(),
+        quantity: (json["quantity"] ?? 0),
+        description: json["description"] ?? "",
+        discount: (json["discount"] ?? 0).toString(),
+        isActive: json["isActive"] ?? false,
+        admin: json["admin"] ?? "",
+        isDeleted: json["isDeleted"] ?? false,
+        createdAt: json["createdAt"] ?? "",
+        updatedAt: json["updatedAt"] ?? "",
+        isWishlisted: json["isWishlisted"] ?? false);
   }
 }
 

@@ -1,12 +1,10 @@
-import 'package:dyd/core/config/navigation-helper/navigation_helper.dart';
 import 'package:dyd/feature/auth/screen/login_screen.dart';
 import 'package:dyd/feature/auth/widget/gradient_container_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
+import 'package:get/get.dart';
 
 import 'core/config/asset-image-path/asset_image_path.dart';
 import 'core/config/spacing/static_spacing_helper.dart';
-import 'core/data/remote-data/prefs_contant_utils.dart';
 import 'core/data/remote-data/shared_prefs.dart';
 import 'core/typo/white_typo.dart';
 import 'feature/landing/screen/landing_screen.dart';
@@ -19,22 +17,20 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  void fGetToken() {
-    Future.delayed(Duration(seconds: 2), () {
+  void fNavigateAfterDelay() {
+    Future.delayed(const Duration(seconds: 5), () {
       String? token = PreferenceUtils.getString("token");
-      if (token == null) {
-        context.pushFadedTransition(LoginScreen());
-        return;
+      if (token != null) {
+        Get.off(() => const NavigationScreen());
       } else {
-        context.pushFadedTransition(LandingScreen());
-        return;
+        Get.off(() => const LoginScreen());
       }
     });
   }
 
   @override
   void initState() {
-    fGetToken();
+    fNavigateAfterDelay();
     super.initState();
   }
 

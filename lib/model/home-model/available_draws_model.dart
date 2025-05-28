@@ -20,37 +20,26 @@ class AvailableDrawsModel {
       numberOfWinners: json['numberOfWinners'] ?? 0,
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'drawId': drawId,
-        'drawExpiryDate': drawExpiryDate.toIso8601String(),
-        'prize': prize.toJson(),
-        'numberOfWinners': numberOfWinners,
-      };
 }
 
 class Prize {
   final String name;
   final String description;
-  final String image;
+  final List<String> imageUrls;
 
   Prize({
     required this.name,
     required this.description,
-    required this.image,
+    required this.imageUrls,
   });
 
   factory Prize.fromJson(Map<String, dynamic> json) {
     return Prize(
       name: json['name'] ?? '',
       description: json['description'] ?? '',
-      image: json['image'] ?? '',
+      imageUrls: json["imageUrls"] != null || json["imageUrls"] != []
+          ? List<String>.from(json["imageUrls"])
+          : [],
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'description': description,
-        'image': image,
-      };
 }

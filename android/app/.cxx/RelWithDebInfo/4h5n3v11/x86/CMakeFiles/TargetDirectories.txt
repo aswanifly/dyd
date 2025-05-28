@@ -1,0 +1,2 @@
+D:/Amunik/dyd/android/app/.cxx/RelWithDebInfo/4h5n3v11/x86/CMakeFiles/edit_cache.dir
+D:/Amunik/dyd/android/app/.cxx/RelWithDebInfo/4h5n3v11/x86/CMakeFiles/rebuild_cache.dir

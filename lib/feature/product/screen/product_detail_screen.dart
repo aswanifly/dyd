@@ -7,6 +7,7 @@ import 'package:dyd/core/config/spacing/dynamic_spacing_widget.dart';
 import 'package:dyd/core/config/spacing/static_spacing_helper.dart';
 import 'package:dyd/core/config/theme/app_palette.dart';
 import 'package:dyd/core/constant/app-loading-state/app_loading_status.dart';
+import 'package:dyd/core/constant/app_constant.dart';
 import 'package:dyd/core/constant/text.dart';
 import 'package:dyd/core/typo/black_typo.dart';
 import 'package:dyd/core/typo/dark_grey_typo.dart';
@@ -19,11 +20,16 @@ import 'package:dyd/core/widget/button-widget/c_gradient_material_button_widget.
 import 'package:dyd/core/widget/button-widget/c_material_button_widget.dart';
 import 'package:dyd/core/widget/image-widget/c_circular_cached_image_widget.dart';
 import 'package:dyd/feature/cart/screen/cart_screen.dart';
+import 'package:dyd/feature/lucky-card/controller/discount_card_controller.dart';
+import 'package:dyd/feature/lucky-card/screen/discount_cards_list_screen.dart';
 import 'package:dyd/feature/product/controller/product_controller.dart';
 import 'package:dyd/model/product-model/product_detail_model.dart';
+import 'package:dyd/model/product-model/related_product_model.dart';
+import 'package:dyd/model/ticket-model/ticket_details_info_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/widget/app-bar-widget/app-bar-widget.dart';
 import '../../../core/widget/loader/circular_progress_loader.dart';
@@ -41,10 +47,13 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final productController = Get.find<ProductController>();
+  final discountCard = Get.put(CouponCardController());
 
   @override
   void initState() {
-    productController.fGetProductDetail(widget.productId);
+    productController.fGetProductsDetails(widget.productId);
+    productController.fGetRelatedProducts(widget.productId);
+    discountCard.fGetDiscountCard();
     super.initState();
   }
 
@@ -86,7 +95,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildCarouselSliderWidget(context),
+          productDetailModel.images.isEmpty
+              ? Text("data")
+              : buildCarouselSliderWidget(context, productDetailModel.images),
           Spacing.verticalSpace(10),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -99,11 +110,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   children: [
                     Text(productDetailModel.productName,
                         style: TypoBlack.black50014),
-                    Icon(Icons.favorite_border, color: AppPalette.black)
+                    InkWell(
+                      onTap: () {
+                        if (productDetailModel.isWishlisted == true) {
+                          productController.removeFromWhishList(
+                              context, productDetailModel.id);
+                        } else {
+                          productController.addToWhishList(
+                              context, productDetailModel.id);
+                        }
+                      },
+                      child: Icon(
+                        productDetailModel.isWishlisted == true
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: productDetailModel.isWishlisted == true
+                            ? AppPalette.red
+                            : AppPalette.black,
+                      ),
+                    )
                   ],
                 ),
                 Spacing.verticalSpace(10),
-                buildRatingWidget(),
+                // buildRatingWidget(),
                 Spacing.verticalSpace(10),
                 RichText(
                   textAlign: TextAlign.start,
@@ -121,7 +150,179 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
                 Spacing.verticalSpace(10),
-                buildDottedBorderOfferCardWidget(),
+                if (discountCard.kDiscountInfoList.isNotEmpty)
+                  InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                            showDragHandle: true,
+                            backgroundColor: AppPalette.whiteShade,
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 20),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        spacing: 10,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              border: Border.all(
+                                                  color: AppPalette.darkGrey2),
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [
+                                                  AppPalette.blueishWhiteShade1,
+                                                  AppPalette.blueishWhiteShade2,
+                                                ],
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 20),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                spacing: 15,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      CNetworkImageRectangularWithTextWidget(
+                                                        height: 80,
+                                                        width: 80,
+                                                        imageLink: discountCard
+                                                                .kDiscountInfoList[
+                                                                    0]
+                                                                .image
+                                                                .isEmpty
+                                                            ? "https://cdn.pixabay.com/photo/2025/03/29/10/59/ryoan-ji-9500830_1280.jpg"
+                                                            : "$IMAGE_URL${discountCard.kDiscountInfoList[0].image}",
+                                                        name: discountCard
+                                                            .kDiscountInfoList[
+                                                                0]
+                                                            .name[0],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
+                                                      Spacing.horizontalSpace(
+                                                          10),
+                                                      Expanded(
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          spacing: 5,
+                                                          children: [
+                                                            Text(
+                                                                discountCard
+                                                                    .kDiscountInfoList[
+                                                                        0]
+                                                                    .name,
+                                                                style: TypoBlack
+                                                                    .black70024),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Card(
+                                                    color: AppPalette.white,
+                                                    elevation: 0,
+                                                    margin: EdgeInsets.zero,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8)),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 10),
+                                                      child: Row(
+                                                        spacing: 10,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.access_time,
+                                                            color: AppPalette
+                                                                .darkGrey,
+                                                          ),
+                                                          Text(
+                                                            DateFormat(
+                                                                    'MMM dd, yyyy')
+                                                                .format(DateTime
+                                                                    .parse(
+                                                              discountCard
+                                                                  .kDiscountInfoList[
+                                                                      0]
+                                                                  .endDate,
+                                                            )),
+                                                            style: TypoBlack
+                                                                .black40014,
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          Spacing.verticalSpace(10),
+                                          Text("Terms & Condition",
+                                              style: TypoBlack.black60016),
+                                          Text("•\tTerms 1 is Lorem",
+                                              style: TypoBlack.black40014),
+                                          Text("•\tTerms 1 is Lorem",
+                                              style: TypoBlack.black40014),
+                                          Text("•\tTerms 1 is Lorem",
+                                              style: TypoBlack.black40014),
+                                          Text("Read more",
+                                              style: TypoDarkViolet
+                                                  .darkViolet50016),
+                                          Spacing.verticalSpace(10),
+                                          CGradientMaterialButton(
+                                            onPressed: () {
+                                              discountCard
+                                                  .checkActiveDiscountCard(
+                                                      fromScreen:
+                                                          "productDetails",
+                                                      context);
+                                            },
+                                            child: Text("Buy Now",
+                                                style: TypoWhite.white70016),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ));
+                      },
+                      child: buildDottedBorderOfferCardWidget()),
                 Spacing.verticalSpace(10),
                 buildStockStatusWidget(productDetailModel),
                 Spacing.verticalSpace(10),
@@ -135,11 +336,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 Spacing.verticalSpace(10),
                 Text("You may also like", style: TypoBlack.black70018),
                 Spacing.verticalSpace(10),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(4, (i) => buildMayLikeCardWidget()),
-                  ),
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: productController.kRelatedProductList.length,
+                      itemBuilder: (BuildContext context, index) {
+                        final relatedProducts =
+                            productController.kRelatedProductList[index];
+                        return buildMayLikeCardWidget(relatedProducts);
+                      }),
                 )
               ],
             ),
@@ -184,7 +391,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             final updatedModel =
                 model.copyWith(isAddedToCard: true, qty: model.qty + 1);
             productController.kProductDetailModel(updatedModel);
-            productController.fAddProductToCart();
+            // productController.fAddProductToCart();
           },
         ),
         CGradientMaterialButton(
@@ -195,7 +402,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             "Buy now",
             style: TypoWhite.white50015,
           ),
-          onPressed: () {},
+          onPressed: () async {
+            final couponCardController = Get.find<CouponCardController>();
+            bool isActive = await couponCardController
+                .checkDiscountCardFromProductBuy(context);
+
+            if (isActive) {
+              final model = productController.kProductDetailModel.value!;
+              final updatedModel =
+                  model.copyWith(isAddedToCard: true, qty: model.qty + 1);
+              productController.kProductDetailModel(updatedModel);
+              productController.fAddProductToCart();
+            } else {
+              Get.to(() => DiscountCardListScreen());
+            }
+          },
         ),
       ],
     );
@@ -261,14 +482,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             "Proceed to cart",
             style: TypoWhite.white50015,
           ),
-          onPressed: () => context.pushFadedTransition(CartScreen()),
+          onPressed: () async {
+            final couponCardController = Get.find<CouponCardController>();
+            bool isActive = await couponCardController
+                .checkDiscountCardFromProductBuy(context);
+
+            if (isActive) {
+              productController.fAddProductToCart();
+            } else {
+              Get.to(() => DiscountCardListScreen());
+            }
+          },
         ),
       ],
     );
   }
 
   //may you like cards
-  Card buildMayLikeCardWidget() {
+  Card buildMayLikeCardWidget(RelatedProductModel relatedProducts) {
     return Card(
       color: AppPalette.white,
       elevation: 0,
@@ -277,8 +508,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CNetworkImageRectangularWithTextWidget(
-            imageLink:
-                'https://cdn.pixabay.com/photo/2022/06/21/21/15/audio-7276511_1280.jpg',
+            imageLink: relatedProducts.image!.isEmpty
+                ? 'https://cdn.pixabay.com/photo/2022/06/21/21/15/audio-7276511_1280.jpg'
+                : "$IMAGE_URL${relatedProducts.image!}",
             name: "",
             height: 130,
             width: 130,
@@ -290,8 +522,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Wireless Earbuds", style: TypoBlack.black40014),
-                Text("${ConstantText.rupeeSymbol}100",
+                Text(relatedProducts.productName!, style: TypoBlack.black40014),
+                Text("${ConstantText.rupeeSymbol}${relatedProducts.basePrice}",
                     style: TypoDarkViolet.darkViolet50015)
               ],
             ),
@@ -355,38 +587,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Row buildRatingWidget() {
-    return Row(
-      children: [
-        ...List.generate(
-            4,
-            (i) => Icon(
-                  Icons.star,
-                  color: AppPalette.yellow,
-                )),
-        Spacing.horizontalSpace(8),
-        Text("(234 reviews)", style: TypoBlack.black40014)
-      ],
-    );
-  }
+  // Row buildRatingWidget() {
+  //   return Row(
+  //     children: [
+  //       ...List.generate(
+  //           4,
+  //           (i) => Icon(
+  //                 Icons.star,
+  //                 color: AppPalette.yellow,
+  //               )),
+  //       Spacing.horizontalSpace(8),
+  //       Text("(234 reviews)", style: TypoBlack.black40014)
+  //     ],
+  //   );
+  // }
 
   //carousel slider widget
-  Stack buildCarouselSliderWidget(BuildContext context) {
+  Stack buildCarouselSliderWidget(BuildContext context, List<String> images) {
     return Stack(
       children: [
         SizedBox(
           height: context.dynamicHeight(0.4),
           width: double.infinity,
           child: CarouselSlider.builder(
-            itemCount: 3,
+            itemCount: images.length,
             itemBuilder:
                 (BuildContext context, int itemIndex, int pageViewIndex) =>
                     CachedNetworkImage(
               height: double.infinity,
               width: double.infinity,
               fit: BoxFit.cover,
-              imageUrl:
-                  'https://cdn.pixabay.com/photo/2016/09/09/22/40/bike-1658214_1280.jpg',
+              imageUrl: "$IMAGE_URL${images[itemIndex]}",
             ),
             options: CarouselOptions(
               autoPlay: false,

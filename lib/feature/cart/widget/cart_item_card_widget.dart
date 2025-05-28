@@ -148,7 +148,7 @@ class CartItemCardWidgetWithOutCountButton extends StatelessWidget {
             ],
           ),
           Spacing.verticalSpace(5),
-          Text("Lucky Draw",style: LightGreyTypo.lightGrey40014),
+          Text("Lucky Draw", style: LightGreyTypo.lightGrey40014),
           Spacing.verticalSpace(7),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -161,7 +161,7 @@ class CartItemCardWidgetWithOutCountButton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text("Know more...",style: TypoDarkViolet.darkViolet50015)
+              Text("Know more...", style: TypoDarkViolet.darkViolet50015)
             ],
           )
         ],

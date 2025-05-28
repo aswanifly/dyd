@@ -1,4 +1,14 @@
+import 'package:dyd/core/constant/app_constant.dart';
+import 'package:dyd/core/widget/button-widget/c_gradient_material_button_widget.dart';
+import 'package:dyd/feature/lucky-card/controller/discount_card_controller.dart';
+import 'package:dyd/feature/lucky-card/screen/discount_cards_list_screen.dart';
+import 'package:dyd/feature/order/screen/track_order_screen.dart';
+import 'package:dyd/feature/product/controller/product_controller.dart';
+
+import 'package:dyd/model/order-model/order_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/config/spacing/static_spacing_helper.dart';
 import '../../../core/config/theme/app_palette.dart';
@@ -14,7 +24,8 @@ import '../../../core/widget/button-widget/c_material_button_widget.dart';
 import '../../../core/widget/image-widget/c_circular_cached_image_widget.dart';
 
 class OrderCardWidget extends StatelessWidget {
-  const OrderCardWidget({super.key});
+  OrderModel orderModel;
+  OrderCardWidget({super.key, required this.orderModel});
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +44,11 @@ class OrderCardWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  "Order #1234566",
+                  "Order #${orderModel.bookingId}",
                   style: TypoBlack.black40014,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text("March 25, 2025", style: LightGreyTypo.lightGrey40014)
+                // Text("March 25, 2025", style: LightGreyTypo.lightGrey40014)
               ],
             ),
             Row(
@@ -49,9 +60,10 @@ class OrderCardWidget extends StatelessWidget {
                     height: 48,
                     width: 48,
                     borderRadius: BorderRadius.circular(12),
-                    imageLink:
-                        "https://cdn.pixabay.com/photo/2021/12/04/20/59/animal-6845972_1280.jpg",
-                    name: ""),
+                    imageLink: orderModel.orderInfos.first.image.isEmpty
+                        ? ""
+                        : "$IMAGE_URL${orderModel.orderInfos.first.image}",
+                    name: orderModel.orderInfos.first.productName),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 5),
@@ -59,15 +71,27 @@ class OrderCardWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Wireless Headphone",
-                            style: TypoBlack.black70016,
-                            overflow: TextOverflow.ellipsis),
+                        Row(
+                          children: [
+                            Text(
+                                orderModel.orderInfos.first.productName.isEmpty
+                                    ? "Product Name"
+                                    : orderModel.orderInfos.first.productName,
+                                style: TypoBlack.black70016,
+                                overflow: TextOverflow.ellipsis),
+                            // Text(
+                            //   DateFormat('MMM dd, yyyy').format(
+                            //       DateTime.parse(orderModel.createdAt!)),
+                            // )
+                          ],
+                        ),
                         Spacing.verticalSpace(3),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text("${ConstantText.rupeeSymbol}900",
+                            Text(
+                                "${ConstantText.rupeeSymbol}${orderModel.orderTotalAmount}",
                                 style: TypoPrimary.primary60016),
                             RichText(
                               text: TextSpan(
@@ -75,7 +99,9 @@ class OrderCardWidget extends StatelessWidget {
                                 style: LightGreyTypo.lightGrey40014,
                                 children: <TextSpan>[
                                   TextSpan(
-                                      text: '2', style: TypoBlack.black50014),
+                                      text: orderModel
+                                          .orderInfos.first!.purchaseQuantity,
+                                      style: TypoBlack.black50014),
                                 ],
                               ),
                             )
@@ -96,39 +122,71 @@ class OrderCardWidget extends StatelessWidget {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                child: Text("In Transit", style: TypoYellow.darkYellow60014),
+                child: Text(orderModel.orderStatus,
+                    style: TypoYellow.darkYellow60014),
               ),
             ),
-            Text("Expected by April", style: TypoDarkGrey.darkGrey40014),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 40,
-              children: [
-                Expanded(
-                  child: CMaterialButton(
-                    elevation: 0,
-                    height: 40,
-                    color: AppPalette.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: AppPalette.darkViolet)),
-                    child: Text("Track Order",
-                        style: TypoDarkViolet.darkViolet70016),
+            Text("Expected by 2 days", style: TypoDarkGrey.darkGrey40014),
+            orderModel.orderStatus == "Confirmed" ||
+                    orderModel.orderStatus == "InTransit" ||
+                    orderModel.orderStatus == "Pending"
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 40,
+                    children: [
+                      Expanded(
+                        child: CMaterialButton(
+                          elevation: 0,
+                          height: 40,
+                          color: AppPalette.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(color: AppPalette.darkViolet)),
+                          child: Text("Track Order",
+                              style: TypoDarkViolet.darkViolet70016),
+                          onPressed: () {
+                            Get.to(TrackOrderScreen(
+                              orderId: orderModel.orderId,
+                            ));
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: CMaterialButton(
+                          elevation: 0,
+                          height: 40,
+                          color: AppPalette.darkViolet,
+                          child: Text("Buy Again", style: TypoWhite.white70016),
+                          onPressed: () async {
+                            final couponCardController =
+                                Get.find<CouponCardController>();
+                            final productController =
+                                Get.find<ProductController>();
+                            bool isActive = await couponCardController
+                                .checkDiscountCardFromProductBuy(context);
+
+                            if (isActive) {
+                              // productController.fAddtoCart(
+                              //   productId: orderModel.orderId,
+                              //   productName: product.productName,
+                              //   salePrice: product.salePrice,
+                              //   qyt: "1",
+                              //   discount: product.discount,
+                              //   basePrice: product.basePrice,
+                              // );
+                            } else {
+                              Get.to(() => DiscountCardListScreen());
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  )
+                : CGradientMaterialButton(
                     onPressed: () {},
+                    child: Text("Buy Again", style: TypoWhite.white70016),
                   ),
-                ),
-                Expanded(
-                  child: CMaterialButton(
-                    elevation: 0,
-                    height: 40,
-                    color: AppPalette.darkViolet,
-                    child: Text("Track Order", style: TypoWhite.white70016),
-                    onPressed: () {},
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),

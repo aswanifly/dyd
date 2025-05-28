@@ -9,11 +9,14 @@ import 'package:dyd/core/typo/primary_typo.dart';
 import 'package:dyd/core/typo/white_typo.dart';
 import 'package:dyd/core/typo/yellow_typo.dart';
 import 'package:dyd/core/widget/loader/overlay_loader_widget.dart';
+import 'package:dyd/core/widget/snackbar/getx_snackbar_widget.dart';
 import 'package:dyd/core/widget/text-field-widget/c_text_field_widget.dart';
 import 'package:dyd/feature/auth/controller/auth_controller.dart';
+import 'package:dyd/feature/auth/screen/for_get_password.dart';
 import 'package:dyd/feature/auth/screen/signup_screen.dart';
 import 'package:dyd/feature/auth/widget/gradient_container_widget.dart';
 import 'package:dyd/feature/landing/screen/landing_screen.dart';
+import 'package:dyd/splash_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -30,7 +33,14 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final phoneNumberTxt = TextEditingController();
+  final emailTxt = TextEditingController();
   final passwordTxt = TextEditingController();
+  bool _isPhoneSelected = true;
+
+  // Function to dismiss the keyboard
+  void _dismissKeyboard() {
+    FocusManager.instance.primaryFocus?.unfocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,28 +80,116 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Email/Phone",
-                              style: TypoPrimary.primary70016,
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    _dismissKeyboard(); // Dismiss keyboard
+                                    setState(() {
+                                      _isPhoneSelected = true;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: _isPhoneSelected
+                                              ? Colors.deepPurple
+                                              : Colors.transparent,
+                                          width: 3,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Phone Number',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Roboto',
+                                          fontSize: 16,
+                                          color: _isPhoneSelected
+                                              ? Color(0xFF4B1BBC)
+                                              : Color(0xFF4B5563),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 15),
+                                GestureDetector(
+                                  onTap: () {
+                                    _dismissKeyboard(); // Dismiss keyboard
+                                    setState(() {
+                                      _isPhoneSelected = false;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: !_isPhoneSelected
+                                              ? Colors.deepPurple
+                                              : Colors.transparent,
+                                          width: 3,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Email',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Roboto',
+                                          fontSize: 16,
+                                          color: !_isPhoneSelected
+                                              ? Color(0xFF4B1BBC)
+                                              : Color(0xFF4B5563),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             Spacing.verticalSpace(5),
-                            CTextField(
-                              controller: phoneNumberTxt,
-                              prefixIcon: IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    Icons.phone_android,
-                                    color: AppPalette.lightGrey,
-                                  )),
-                              hintText: "Email/Phone",
-                            ),
+                            _isPhoneSelected
+                                ? CTextField(
+                                    keyboardType: TextInputType.number,
+                                    maxLength: 10,
+                                    controller: phoneNumberTxt,
+                                    prefixIcon: IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.phone_android,
+                                          color: AppPalette.lightGrey,
+                                        )),
+                                    hintText: "Phone",
+                                  )
+                                : CTextField(
+                                    controller: emailTxt,
+                                    keyboardType: TextInputType.emailAddress,
+                                    prefixIcon: IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.mail,
+                                          color: AppPalette.lightGrey,
+                                        )),
+                                    hintText: "Email",
+                                  ),
                             Spacing.verticalSpace(15),
                             Text(
                               "Password",
                               style: TypoDarkGrey.darkGrey50014,
                             ),
                             Spacing.verticalSpace(5),
-                            CTextField(
+                            CPTextField(
+                              keyboardType: TextInputType.text,
                               controller: passwordTxt,
                               hintText: "Password",
                               isObscureText: true,
@@ -106,16 +204,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             CGradientMaterialButton(
                               onPressed: () {
                                 authController
-                                    .fUserLogin(phoneNumberTxt.text.trim(),
+                                    .fUserLogin(
+                                        context,
+                                        _isPhoneSelected
+                                            ? phoneNumberTxt.text.trim()
+                                            : emailTxt.text.trim(),
                                         passwordTxt.text.trim())
                                     .then((value) {
                                   if (authController
                                           .kLoginLoadingStatus.value ==
                                       Status.success) {
-                                    if (context.mounted) {
-                                      context
-                                          .pushFadedTransition(LandingScreen());
-                                    }
+                                    Get.off(NavigationScreen());
                                   }
                                 });
                               },
@@ -128,9 +227,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    "Forget Password?",
-                                    style: TypoPrimary.primary50014,
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(ForGetPassword());
+                                    },
+                                    child: Text(
+                                      "Forget Password?",
+                                      style: TypoPrimary.primary50014,
+                                    ),
                                   ),
                                   Spacing.verticalSpace(15),
                                   RichText(
@@ -152,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Spacing.verticalSpace(15),
                                   Text(
                                     "By continuing you agree to our",
-                                    style: TypoDarkGrey.darkGrey50012,
+                                    style: TypoDarkGrey.darkGrey50014,
                                   ),
                                   Text(
                                     "Terms of Service and Privacy Policy",

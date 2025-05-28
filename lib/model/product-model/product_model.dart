@@ -3,7 +3,7 @@ class ProductModel {
     required this.id,
     required this.category,
     required this.brand,
-    required this.image,
+    required this.images,
     required this.productName,
     required this.basePrice,
     required this.salePrice,
@@ -20,7 +20,7 @@ class ProductModel {
   final String id;
   final String category;
   final String brand;
-  final String image;
+  final List<String> images;
   final String productName;
   final String basePrice;
   final String salePrice;
@@ -37,7 +37,7 @@ class ProductModel {
     String? id,
     String? category,
     String? brand,
-    String? image,
+    List<String>? images,
     String? productName,
     String? basePrice,
     String? salePrice,
@@ -54,7 +54,7 @@ class ProductModel {
       id: id ?? this.id,
       category: category ?? this.category,
       brand: brand ?? this.brand,
-      image: image ?? this.image,
+      images: images ?? this.images,
       productName: productName ?? this.productName,
       basePrice: basePrice ?? this.basePrice,
       salePrice: salePrice ?? this.salePrice,
@@ -69,12 +69,14 @@ class ProductModel {
     );
   }
 
-  factory ProductModel.fromJson(Map<String, dynamic> json){
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
       id: json["_id"] ?? "",
       category: json["category"] ?? "",
       brand: json["brand"] ?? "",
-      image: json["image"] ?? "",
+      images: json["images"] != null || json["images"] != []
+          ? List<String>.from(json["images"])
+          : [],
       productName: json["productName"] ?? "",
       basePrice: (json["basePrice"] ?? 0).toString(),
       salePrice: (json["salePrice"] ?? 0).toString(),
@@ -88,5 +90,4 @@ class ProductModel {
       updatedAt: json["updatedAt"] ?? "",
     );
   }
-
 }

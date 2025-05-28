@@ -37,8 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Obx(() {
           final isCouponScreen = homeController.kIsCouponScreen.value;
           return Container(
-            height: 33,
-            width: 220,
+            height: 40,
+            width: double.infinity,
             decoration: BoxDecoration(
               color: AppPalette.white,
               borderRadius: BorderRadius.circular(10),
@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(
-                              height: 30,
+                              height: 47,
                               // width: isCouponScreen ? 30 : 40,
                               child: Center(
                                   child: SvgPicture.asset(
@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           SizedBox(
-                            height: 30,
+                            height: 37,
                             // width: !isCouponScreen ? 30 : 40,
                             child: Center(
                               child: FaIcon(

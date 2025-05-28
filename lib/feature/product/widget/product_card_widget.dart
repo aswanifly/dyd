@@ -1,4 +1,6 @@
 import 'package:dyd/core/config/navigation-helper/navigation_helper.dart';
+import 'package:dyd/core/constant/app_constant.dart';
+import 'package:dyd/core/widget/image-widget/cached_network_image.dart';
 import 'package:dyd/feature/product/screen/product_detail_screen.dart';
 import 'package:dyd/model/product-model/product_model.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,7 @@ import '../../../core/typo/black_typo.dart';
 import '../../../core/widget/image-widget/c_circular_cached_image_widget.dart';
 
 class ProductCardWidget extends StatelessWidget {
-  final ProductModel productModel;
+  final productModel;
 
   const ProductCardWidget({super.key, required this.productModel});
 
@@ -27,8 +29,16 @@ class ProductCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
+              // child: CNetworkImageWithTextWidget(
+              //     imageLink: productModel.images[0].isEmpty
+              //         ? ""
+              //         : "$IMAGE_URL${productModel.images[0]}",
+              //     name: productModel.productName[0])
               child: CNetworkImageRectangularWithTextWidget(
-                imageLink: "",
+                imageLink: (productModel.images.isEmpty ||
+                        productModel.images[0].isEmpty)
+                    ? ""
+                    : "$IMAGE_URL${productModel.images[0]}",
                 fit: BoxFit.cover,
                 width: double.infinity,
                 name: productModel.productName,

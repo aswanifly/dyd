@@ -38,17 +38,4 @@ class LuckyCardModel {
       v: json['__v'] ?? 0,
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        '_id': id,
-        'user': user,
-        'orderBooking': orderBooking,
-        'discountCard': discountCard,
-        'LuckyCardModelNumber': LuckyCardModelNumber,
-        'drawExpiryDate': drawExpiryDate.toIso8601String(),
-        'status': status,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-        '__v': v,
-      };
 }

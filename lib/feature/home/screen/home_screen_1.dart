@@ -37,23 +37,24 @@ class HomeScreen1 extends StatelessWidget {
               width: double.infinity,
               child: CarouselSlider.builder(
                 itemCount: adList.length,
-                itemBuilder: (BuildContext context, int itemIndex,
-                    int pageViewIndex) =>
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: CachedNetworkImage(
-                          height: double.infinity,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          imageUrl: adList[itemIndex],
-                        ),
-                      ),
-                    ),
+                itemBuilder:
+                    (BuildContext context, int itemIndex, int pageViewIndex) =>
+                        ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    height: double.infinity,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    imageUrl: adList[itemIndex],
+                  ),
+                ),
                 options: CarouselOptions(
-                  autoPlay: false,
-                  reverse: false,
+                  autoPlay: true,
+                  autoPlayInterval: Duration(seconds: 3),
+                  autoPlayAnimationDuration: Duration(seconds: 1),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enlargeCenterPage: true,
+                  viewportFraction: 0.9,
                 ),
               ),
             ),
@@ -77,8 +78,8 @@ class HomeScreen1 extends StatelessWidget {
                         AppPalette.lightViolet
                       ])),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,13 +111,11 @@ class HomeScreen1 extends StatelessWidget {
                   width: 170,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      gradient: LinearGradient(colors: [
-                        AppPalette.yellow,
-                        AppPalette.darkYellow
-                      ])),
+                      gradient: LinearGradient(
+                          colors: [AppPalette.yellow, AppPalette.darkYellow])),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,

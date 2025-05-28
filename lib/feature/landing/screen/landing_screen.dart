@@ -5,6 +5,7 @@ import 'package:dyd/core/typo/light_grey_typo.dart';
 import 'package:dyd/feature/cart/screen/cart_screen.dart';
 import 'package:dyd/feature/home/screen/home_screen.dart';
 import 'package:dyd/feature/landing/controller/landing_controller.dart';
+import 'package:dyd/feature/landing/screen/custom_bottom_navigatorbar.dart';
 import 'package:dyd/feature/lucky-card/screen/lucky_card_screen.dart';
 import 'package:dyd/feature/profile/screen/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -77,5 +78,83 @@ class LandingScreen extends StatelessWidget {
             ),
           )),
     );
+  }
+}
+
+class NavigationScreen extends StatefulWidget {
+  const NavigationScreen({super.key});
+
+  @override
+  State<NavigationScreen> createState() => _NavigationScreenState();
+}
+
+class _NavigationScreenState extends State<NavigationScreen> {
+  final landingController = Get.put(
+    LandingController(),
+    permanent: true,
+  );
+
+  final pages = [
+    HomeScreen(),
+    LuckyCardScreen(),
+    CartScreen(),
+    ProfileScreen(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showGeneralDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.transparent,
+        // transitionDuration: Duration(seconds: 5),
+        pageBuilder: (context, anim1, anim2) {
+          return Center(
+            child: Image.asset(
+              'assets/vedios/imluckyhandshake-ezgif.com-resize.gif',
+              width: 300,
+              height: 300,
+              fit: BoxFit.cover,
+            ),
+          );
+        },
+      );
+
+      // Auto-close the popup after 5 seconds
+      Future.delayed(Duration(seconds: 1), () {
+        if (mounted && Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (landingController.kCurrentScreenIndex.value != 0) {
+          landingController.kCurrentScreenIndex(0);
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: Obx(() => pages[landingController.kCurrentScreenIndex.value]),
+        bottomNavigationBar: Obx(() => CustomBottomNavigationBar(
+              selectedIndex: landingController.kCurrentScreenIndex.value,
+              onItemSelected: _onItemTapped,
+            )),
+      ),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    if (landingController.kCurrentScreenIndex.value != index) {
+      landingController.kCurrentScreenIndex(index);
+    }
   }
 }

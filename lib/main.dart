@@ -20,18 +20,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     PreferenceUtils.init();
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'DYD',
+      title: 'IM LUCKY',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightThemeMode,
       home: SplashScreen(),

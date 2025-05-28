@@ -23,13 +23,13 @@ class DiscountInfoModel {
   final String endDate;
   final bool isActive;
 
-  factory DiscountInfoModel.fromJson(Map<String, dynamic> json){
+  factory DiscountInfoModel.fromJson(Map<String, dynamic> json) {
     return DiscountInfoModel(
       id: json["_id"] ?? "",
       image: json["image"] ?? "",
-      discountPercent: json["discountPercent"] ?? "",
-      price: json["price"] ?? "",
-      validityInDays: json["validityInDays"] ?? "",
+      discountPercent: json["discountPercent"].toString() ?? "",
+      price: json["price"].toString() ?? "",
+      validityInDays: json["validityInDays"].toString() ?? "",
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
       updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
       name: json["name"] ?? "",
@@ -37,5 +37,4 @@ class DiscountInfoModel {
       endDate: json["endDate"] ?? "",
     );
   }
-
 }

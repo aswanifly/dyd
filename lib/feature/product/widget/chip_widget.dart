@@ -1,13 +1,19 @@
+import 'package:dyd/core/typo/black_typo.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/config/theme/app_palette.dart';
-import '../../../core/typo/black_typo.dart';
 
 class CategoryChipWidget extends StatelessWidget {
   final String label;
+  final bool selected;
   final void Function()? onTap;
 
-  const CategoryChipWidget({super.key, required this.label, this.onTap});
+  const CategoryChipWidget({
+    super.key,
+    required this.label,
+    this.selected = false,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +22,17 @@ class CategoryChipWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Chip(
-          label: Text(label, style: TypoBlack.black40014),
-          color: WidgetStatePropertyAll(AppPalette.lightGrey2),
+          label: Text(label,
+              style: TextStyle(color: selected ? Colors.white : Colors.black)),
+          backgroundColor:
+              selected ? AppPalette.primaryColor1 : AppPalette.lightGrey2,
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: BorderSide(color: AppPalette.transparent)),
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color:
+                  selected ? AppPalette.primaryColor1 : AppPalette.transparent,
+            ),
+          ),
         ),
       ),
     );

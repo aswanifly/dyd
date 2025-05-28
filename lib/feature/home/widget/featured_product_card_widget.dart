@@ -12,9 +12,15 @@ import '../../../core/typo/black_typo.dart';
 import '../../../core/widget/button-widget/c_material_button_widget.dart';
 import '../../../core/widget/image-widget/cached_network_image.dart';
 
-class FeaturedProductCardWidget extends StatelessWidget {
+class FeaturedProductCardWidget extends StatefulWidget {
   const FeaturedProductCardWidget({super.key});
 
+  @override
+  State<FeaturedProductCardWidget> createState() =>
+      _FeaturedProductCardWidgetState();
+}
+
+class _FeaturedProductCardWidgetState extends State<FeaturedProductCardWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -68,8 +74,8 @@ class FeaturedProductCardWidget extends StatelessWidget {
                             children: <TextSpan>[
                               TextSpan(
                                   text: "${ConstantText.rupeeSymbol}210",
-                                  style: LightGreyTypo.lightGrey40014LineThrough),
-
+                                  style:
+                                      LightGreyTypo.lightGrey40014LineThrough),
                             ],
                           ),
                         ),
@@ -85,7 +91,8 @@ class FeaturedProductCardWidget extends StatelessWidget {
                       ],
                     ),
                     Spacing.verticalSpace(10),
-                    Text("Get it for ${ConstantText.rupeeSymbol}900",style: GreenTypo.green40012)
+                    Text("Get it for ${ConstantText.rupeeSymbol}900",
+                        style: GreenTypo.green40012)
                   ],
                 ),
               )

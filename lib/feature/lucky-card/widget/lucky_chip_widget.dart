@@ -17,6 +17,7 @@ class LuckyChipWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
+    
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
           side: BorderSide(color: AppPalette.transparent)),

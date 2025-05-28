@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dyd/core/constant/app_constant.dart';
 import 'package:flutter/material.dart';
 
 class CCachedNetworkImage extends StatelessWidget {
@@ -14,13 +15,14 @@ class CCachedNetworkImage extends StatelessWidget {
       imageUrl: imageLink,
       fit: fit,
       progressIndicatorBuilder: (context, url, downloadProgress) =>
-      const Center(
+          const Center(
         child: Text(
           "Loading...",
           style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
         ),
       ),
-      errorWidget: (context, url, error) =>const Icon(Icons.image_not_supported_outlined),
+      errorWidget: (context, url, error) =>
+          const Icon(Icons.image_not_supported_outlined),
     );
   }
 }

@@ -1,6 +1,9 @@
 import 'package:dyd/core/config/navigation-helper/navigation_helper.dart';
 import 'package:dyd/core/config/spacing/static_spacing_helper.dart';
 import 'package:dyd/core/config/theme/app_palette.dart';
+import 'package:dyd/core/constant/app-loading-state/app_loading_status.dart';
+import 'package:dyd/core/constant/app_constant.dart';
+import 'package:dyd/core/data/remote-data/shared_prefs.dart';
 import 'package:dyd/core/typo/black_typo.dart';
 import 'package:dyd/core/typo/dark_grey_typo.dart';
 import 'package:dyd/core/typo/primary_typo.dart';
@@ -10,19 +13,39 @@ import 'package:dyd/core/typo/yellow_typo.dart';
 import 'package:dyd/core/widget/button-widget/c_gradient_material_button_widget.dart';
 import 'package:dyd/core/widget/button-widget/c_material_button_widget.dart';
 import 'package:dyd/core/widget/image-widget/cached_network_image.dart';
+import 'package:dyd/feature/auth/controller/auth_controller.dart';
+import 'package:dyd/feature/auth/screen/login_screen.dart';
+import 'package:dyd/feature/cart/view-model/cart_view_model.dart';
+import 'package:dyd/feature/landing/controller/landing_controller.dart';
+import 'package:dyd/feature/lucky-card/screen/discount_cards_list_screen.dart';
 import 'package:dyd/feature/lucky-card/screen/lucky_card_screen.dart';
+import 'package:dyd/feature/profile/screen/edit_screen.dart';
+import 'package:dyd/feature/profile/view-model/user_profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
-import '../../lucky-card/screen/discount_card_screen.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../../order/screen/my_order_screen.dart';
 import '../../product/screen/wishlist_product_screen.dart';
 import '../widget/profile_count_widget.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  UserProfileViewModel userProfileViewModel = Get.put(UserProfileViewModel());
+  CartViewModel cartViewModel = Get.put(CartViewModel());
+  @override
+  void initState() {
+    userProfileViewModel.fGetUserProfile(context);
+    cartViewModel.fGetProfilesCounts();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,8 +119,7 @@ class ProfileScreen extends StatelessWidget {
                     backgroundColor: AppPalette.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)
-                    ),
+                        borderRadius: BorderRadius.circular(15)),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -115,7 +137,7 @@ class ProfileScreen extends StatelessWidget {
                         Row(
                           spacing: 25,
                           mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CMaterialButton(
                               elevation: 0,
@@ -134,30 +156,40 @@ class ProfileScreen extends StatelessWidget {
                                 minWidth: 120,
                                 elevation: 0,
                                 child: Text("Yes", style: TypoWhite.white50016),
-                                onPressed: () {})
+                                onPressed: () {
+                                  PreferenceUtils.clearAllData();
+                                  Get.find<LandingController>()
+                                      .kCurrentScreenIndex(0);
+                                  Get.offAll(LoginScreen());
+                                })
                           ],
                         )
                       ],
                     ),
                   ));
         },
-        child: Card(
-          elevation: 0,
-          color: AppPalette.white,
-          shape: RoundedRectangleBorder(
-            side: BorderSide(color: AppPalette.red),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 5,
-              children: [
-                Icon(Icons.logout, color: AppPalette.red),
-                Text("Logout", style: TypoRed.red50015)
-              ],
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Card(
+            elevation: 0,
+            color: AppPalette.white,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(color: AppPalette.red),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 10,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: 5,
+                children: [
+                  Icon(Icons.logout, color: AppPalette.red),
+                  Text("Logout", style: TypoRed.red50015)
+                ],
+              ),
             ),
           ),
         ),
@@ -167,7 +199,7 @@ class ProfileScreen extends StatelessWidget {
 
   Widget buildNavigationCardWidget(
       BuildContext context, List<Map<String, dynamic>> profileList, int index) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         if (index == 0) {
           context.pushFadedTransition(MyOrderScreen());
@@ -182,7 +214,7 @@ class ProfileScreen extends StatelessWidget {
           return;
         }
         if (index == 3) {
-          context.pushFadedTransition(DiscountCardScreen());
+          context.pushFadedTransition(DiscountCardListScreen());
           return;
         }
         if (index == 4) {
@@ -223,63 +255,79 @@ class ProfileScreen extends StatelessWidget {
 
   Padding buildProductStatusCountWidget() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ProfileCountWidget(
-            icon: Icons.shopping_bag,
-            title: "Count",
-            count: "12",
-          ),
-          ProfileCountWidget(
-            icon: Icons.favorite,
-            title: "Wishlist",
-            count: "24",
-          ),
-          ProfileCountWidget(
-            icon: Icons.airplane_ticket,
-            title: "Discount Count",
-            count: "12",
-            type: "faIcon",
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      child: Obx(() {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ProfileCountWidget(
+              icon: Icons.shopping_bag,
+              title: "Count",
+              count: cartViewModel.orderCount.value,
+            ),
+            ProfileCountWidget(
+              icon: Icons.favorite,
+              title: "Wishlist",
+              count: cartViewModel.wishListCount.value,
+            ),
+            ProfileCountWidget(
+              icon: Icons.airplane_ticket,
+              title: "Discount ",
+              count: cartViewModel.discountCount.value,
+              type: "faIcon",
+            ),
+          ],
+        );
+      }),
     );
   }
 
   Padding buildProfileDetailWidget() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ClipOval(
-            child: SizedBox(
-              height: 75,
-              width: 75,
-              child: CCachedNetworkImage(
-                  imageLink:
-                      "https://cdn.pixabay.com/photo/2022/07/31/21/27/little-boy-7356918_1280.jpg"),
-            ),
-          ),
-          Spacing.verticalSpace(8),
-          Text("Sarah Johnson", style: TypoWhite.white70024),
-          Text("gamil@gmail.com", style: TypoYellow.yellow50015),
-          Spacing.verticalSpace(10),
-          CMaterialButton(
-              minWidth: 148,
-              height: 40,
-              color: AppPalette.yellow,
-              child: Text(
-                "Edit Profile",
-                style: TypoPrimary.primary60016,
+      child: Obx(() {
+        if (userProfileViewModel.kProfileLoadingStatus.value ==
+            Status.loading) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ClipOval(
+              child: SizedBox(
+                height: 75,
+                width: 75,
+                child: CCachedNetworkImage(
+                    imageLink: userProfileViewModel
+                            .kUserImageForRegister.value.isEmpty
+                        ? "https://cdn.pixabay.com/photo/2022/07/31/21/27/little-boy-7356918_1280.jpg"
+                        : "$IMAGE_URL${userProfileViewModel.kUserImageForRegister.value}"),
               ),
-              onPressed: () {})
-        ],
-      ),
+            ),
+            Spacing.verticalSpace(8),
+            Text(userProfileViewModel.kUserName.text,
+                style: TypoWhite.white70024),
+            Text(userProfileViewModel.kEmailTxt.text,
+                style: TypoYellow.yellow50015),
+            Spacing.verticalSpace(10),
+            CMaterialButton(
+                minWidth: 148,
+                height: 40,
+                color: AppPalette.yellow,
+                child: Text(
+                  "Edit Profile",
+                  style: TypoPrimary.primary60016,
+                ),
+                onPressed: () {
+                  Get.to(EditScreen());
+                })
+          ],
+        );
+      }),
     );
   }
 }

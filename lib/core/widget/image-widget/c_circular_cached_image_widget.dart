@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dyd/core/config/extension/extension.dart';
+import 'package:dyd/core/constant/app_constant.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/theme/app_palette.dart';
@@ -62,9 +63,6 @@ class CNetworkImageWithTextWidget extends StatelessWidget {
                       child: CircularProgressIndicator(
                           color: AppPalette.primaryColor1),
                     ),
-                    errorWidget: (context, url, error) => const Icon(
-                      Icons.error,
-                    ),
                   )),
       ),
     );
@@ -112,7 +110,7 @@ class CNetworkImageRectangularWithTextWidget extends StatelessWidget {
         child: SizedBox(
             height: height,
             width: width,
-            child: imageLink.isEmpty
+            child: imageLink == ""
                 ? Center(
                     child: Text(
                         showFullTitle
@@ -127,9 +125,6 @@ class CNetworkImageRectangularWithTextWidget extends StatelessWidget {
                         (context, url, downloadProgress) => const Center(
                       child: CircularProgressIndicator(
                           color: AppPalette.primaryColor1),
-                    ),
-                    errorWidget: (context, url, error) => const Icon(
-                      Icons.error,
                     ),
                   )),
       ),

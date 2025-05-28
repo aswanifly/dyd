@@ -1,5 +1,6 @@
 import 'package:dyd/core/config/spacing/static_spacing_helper.dart';
 import 'package:dyd/core/config/theme/app_palette.dart';
+import 'package:dyd/core/constant/app_constant.dart';
 import 'package:dyd/core/typo/black_typo.dart';
 import 'package:dyd/core/typo/dark_violet_typo.dart';
 import 'package:dyd/core/typo/light_grey_typo.dart';
@@ -7,9 +8,10 @@ import 'package:dyd/core/typo/white_typo.dart';
 import 'package:dyd/core/widget/button-widget/c_material_button_widget.dart';
 import 'package:dyd/core/widget/image-widget/c_circular_cached_image_widget.dart';
 import 'package:dyd/feature/home/controller/home_controller.dart';
-import 'package:dyd/feature/home/widget/coupon_card_widget_home.dart';
+import 'package:dyd/feature/lucky-card/screen/discount_cards_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/state_manager.dart';
@@ -49,6 +51,9 @@ class _HomeScreen2State extends State<HomeScreen2> {
             Spacing.verticalSpace(10),
 
             Obx(() {
+              if (homeController.kRecentWinnerList.isEmpty) {
+                return Center(child: Text("No Recent Winners"));
+              }
               return SizedBox(
                 height: 130,
                 child: ListView.builder(
@@ -61,7 +66,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                         color: AppPalette.white,
                         child: SizedBox(
                           height: 108,
-                          width: 200,
+                          // width: 200,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 15),
@@ -76,7 +81,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                                       width: 40,
                                       imageLink: winners.image.isEmpty
                                           ? 'https://cdn.pixabay.com/photo/2024/05/19/19/30/ai-generated-8773213_1280.png'
-                                          : winners.image,
+                                          : "$IMAGE_URL${winners.image}",
                                       name: "",
                                     ),
                                     Spacing.horizontalSpace(8),
@@ -107,6 +112,8 @@ class _HomeScreen2State extends State<HomeScreen2> {
                                     ),
                                     Spacing.horizontalSpace(8),
                                     Text(winners.prize.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TypoDarkViolet.darkViolet60016),
                                   ],
                                 )
@@ -123,6 +130,11 @@ class _HomeScreen2State extends State<HomeScreen2> {
             Text("Available Draw", style: TypoBlack.black70018),
             Spacing.verticalSpace(10),
             Obx(() {
+              if (homeController.kAvailableDraws.isEmpty) {
+                return Center(
+                  child: Text("No Avaible Draws"),
+                );
+              }
               return SizedBox(
                 height: 300,
                 child: ListView.builder(
@@ -151,10 +163,10 @@ class _HomeScreen2State extends State<HomeScreen2> {
                                     width: 140,
                                     borderRadius: BorderRadius.circular(8),
                                     imageLink: availableDraws
-                                            .prize.image.isEmpty
-                                        ? 'https://cdn.pixabay.com/photo/2024/12/28/13/28/tram-9296118_1280.jpg'
-                                        : availableDraws.prize.image,
-                                    name: '',
+                                            .prize.imageUrls[0].isEmpty
+                                        ? ""
+                                        : "$IMAGE_URL${availableDraws.prize.imageUrls[0]}",
+                                    name: availableDraws.prize.name,
                                   ),
                                   Spacing.verticalSpace(5),
                                   Padding(
@@ -162,6 +174,8 @@ class _HomeScreen2State extends State<HomeScreen2> {
                                     child: Align(
                                         alignment: Alignment.topLeft,
                                         child: Text(availableDraws.prize.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TypoBlack.black50015)),
                                   ),
                                   Spacing.verticalSpace(4),
@@ -185,7 +199,9 @@ class _HomeScreen2State extends State<HomeScreen2> {
                                           "Enter Draw",
                                           style: TypoWhite.white60014,
                                         ),
-                                        onPressed: () {}),
+                                        onPressed: () {
+                                          Get.to(DiscountCardListScreen());
+                                        }),
                                   )
                                 ],
                               ),

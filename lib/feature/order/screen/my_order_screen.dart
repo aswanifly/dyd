@@ -1,75 +1,119 @@
-import 'package:dyd/core/config/spacing/static_spacing_helper.dart';
-import 'package:dyd/core/config/theme/app_palette.dart';
-import 'package:dyd/core/constant/text.dart';
-import 'package:dyd/core/typo/black_typo.dart';
-import 'package:dyd/core/typo/dark_grey_typo.dart';
-import 'package:dyd/core/typo/dark_violet_typo.dart';
-import 'package:dyd/core/typo/light_grey_typo.dart';
-import 'package:dyd/core/typo/primary_typo.dart';
-import 'package:dyd/core/typo/white_typo.dart';
-import 'package:dyd/core/typo/yellow_typo.dart';
+import 'package:dyd/core/constant/app-loading-state/app_loading_status.dart';
 import 'package:dyd/core/widget/app-bar-widget/app-bar-widget.dart';
-import 'package:dyd/core/widget/button-widget/c_material_button_widget.dart';
-import 'package:dyd/core/widget/image-widget/c_circular_cached_image_widget.dart';
+import 'package:dyd/feature/cart/view-model/cart_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../widget/order_card_widget.dart';
 import '../widget/order_chip_widget.dart';
 
-class MyOrderScreen extends StatelessWidget {
+class MyOrderScreen extends StatefulWidget {
   const MyOrderScreen({super.key});
+
+  @override
+  State<MyOrderScreen> createState() => _MyOrderScreenState();
+}
+
+class _MyOrderScreenState extends State<MyOrderScreen> {
+  final CartViewModel cartViewModel = Get.put(
+    CartViewModel(),
+  );
+
+  @override
+  void initState() {
+    // Reset filter to deselect all chips on screen reopen
+    cartViewModel.fGetOrderList(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: GradientAppBar(
-        title: Text("My Orders"),
+        title: const Text("My Orders"),
         centerTitle: true,
       ),
       body: Column(
         children: [
           buildOrderStatusWidget(),
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          Obx(() {
+            if (cartViewModel.kCartsLoading.value == Status.error) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Failed to load orders",
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () => cartViewModel.fGetOrderList(context),
+                      child: const Text("Retry"),
+                    ),
+                  ],
+                ),
+              );
+            } else if (cartViewModel.orderList.isEmpty) {
+              return const Center(child: Text("No orders found"));
+            }
+
+            return Expanded(
               child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (_, index) => OrderCardWidget(),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                itemCount: cartViewModel.orderList.length,
+                itemBuilder: (BuildContext context, index) {
+                  final orderModel = cartViewModel.orderList[index];
+                  return OrderCardWidget(orderModel: orderModel);
+                },
               ),
-            ),
-          )
+            );
+          }),
         ],
       ),
     );
   }
 
-  Padding buildOrderStatusWidget() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: SingleChildScrollView(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            OrderChipWidget(
-              title: "All",
-              isActive: true,
-            ),
-            OrderChipWidget(
-              title: "In Transit",
-              isActive: true,
-            ),
-            OrderChipWidget(
-              title: "Active",
-              isActive: false,
-            ),
-            OrderChipWidget(
-              title: "Complete",
-              isActive: false,
-            ),
-          ],
-        ),
-      ),
+  Widget buildOrderStatusWidget() {
+    const List<String> statusFilters = [
+      "All",
+      "Confirmed",
+      "InTransit",
+      "Returned",
+      "Cancelled",
+      "Completed"
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Obx(() => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: statusFilters.map((type) {
+              bool isActive =
+                  (type == "All" && cartViewModel.orderFilters.value == "") ||
+                      (cartViewModel.orderFilters.value == type);
+
+              return GestureDetector(
+                onTap: () {
+                  if (isActive) {
+                    cartViewModel.orderFilters.value = "";
+                  } else {
+                    cartViewModel.orderFilters.value =
+                        (type == "All") ? "" : type;
+                  }
+
+                  cartViewModel.fGetOrderList(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: OrderChipWidget(
+                    title: type,
+                    isActive: isActive,
+                  ),
+                ),
+              );
+            }).toList(),
+          )),
     );
   }
 }

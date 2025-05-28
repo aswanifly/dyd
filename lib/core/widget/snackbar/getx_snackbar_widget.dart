@@ -29,3 +29,32 @@ class SnackBarGetXUtils {
     );
   }
 }
+
+void showCustomSnackBar(BuildContext? context, String message) {
+  final snackBar = SnackBar(
+    backgroundColor: Colors.transparent, // Make background transparent
+    elevation: 0,
+    behavior: SnackBarBehavior.floating,
+    content: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            AppPalette.primaryColor1,
+            AppPalette.primaryColor2,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        message,
+        style: TypoWhite.white50016,
+      ),
+    ),
+    duration: const Duration(seconds: 3),
+  );
+
+  ScaffoldMessenger.of(context!).showSnackBar(snackBar);
+}

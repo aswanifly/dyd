@@ -29,7 +29,7 @@ class ApiCallType {
     try {
       final fullUrl = "$_baseUrl$url";
       final Response response =
-      await _apiService.apiTypeGet(url: fullUrl, token: token);
+          await _apiService.apiTypeGet(url: fullUrl, token: token);
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw ServerException(response.data["message"]);
       }
@@ -48,8 +48,8 @@ class ApiCallType {
 
   Future<ApiResponse> postRequest(
       {required String url,
-        String? token,
-        required Map<String, dynamic> data}) async {
+      String? token,
+      required Map<String, dynamic> data}) async {
     try {
       final fullUrl = "$_baseUrl$url";
       final Response response = await _apiService.apiTypePost(
@@ -63,7 +63,8 @@ class ApiCallType {
       }
 
       if (response.data["responseCode"] == 200 ||
-          response.data["responseCode"] == 201) {
+          response.data["responseCode"] == 201 ||
+          response.data["responseCode"] == 400) {
         return ApiResponse(
             statusCode: response.data["responseCode"], response: response.data);
       } else {
@@ -167,10 +168,10 @@ class ApiCallType {
         errorMessage = "Send timeout. Please try again.";
         break;
       case DioExceptionType.badResponse:
-      // Handle network errors
+        // Handle network errors
         if (error.response != null) {
           errorMessage =
-          "Error: ${error.response?.statusCode} - ${error.response?.data}";
+              "Error: ${error.response?.statusCode} - ${error.response?.data}";
         } else {
           errorMessage = "An unexpected error occurred.";
         }

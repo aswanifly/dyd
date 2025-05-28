@@ -6,9 +6,16 @@ import 'package:flutter/material.dart';
 class SignUpTextFieldWidget extends StatelessWidget {
   final String name;
   final TextEditingController controller;
+  final TextInputType? keyboardType;
+  final int? maxLength;
 
-  const SignUpTextFieldWidget(
-      {super.key, required this.name, required this.controller});
+  const SignUpTextFieldWidget({
+    super.key,
+    required this.name,
+    required this.controller,
+    this.keyboardType,
+    this.maxLength,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +29,8 @@ class SignUpTextFieldWidget extends StatelessWidget {
         ),
         Spacing.verticalSpace(5),
         CTextField(
+          maxLength: maxLength,
+          keyboardType: keyboardType,
           controller: controller,
           hintText: name,
         ),
