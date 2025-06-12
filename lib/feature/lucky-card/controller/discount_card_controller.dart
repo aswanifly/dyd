@@ -252,7 +252,10 @@ class CouponCardController extends GetxController {
 
       showCustomSnackBar(context, res.response["message"]);
 
-      Get.offAll(() => NavigationScreen());
+      Get.offAll(() => NavigationScreen(
+            showSplash: false,
+          ));
+
       Get.find<LandingController>().kCurrentScreenIndex(1);
       // Future.delayed(Duration(milliseconds: ), () {
 
@@ -302,10 +305,7 @@ class CouponCardController extends GetxController {
       final response = await CouponCardRepo.checkActiveDiscountCard();
 
       final bool isActive = response.response["isActive"];
-      final String message = response.response["message"];
-      if (!isActive) {
-        showCustomSnackBar(context, message);
-      }
+      // final String message = response.response["message"];
 
       kCheckActiveLoading(Status.success);
       return isActive;

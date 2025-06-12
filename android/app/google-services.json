@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "367602845343",
+    "project_id": "dyd-firebase-461c8",
+    "storage_bucket": "dyd-firebase-461c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367602845343:android:88ef6a706aef50a2f284aa",
+        "android_client_info": {
+          "package_name": "com.example.dyd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-TlCDX6G2-rJ8bJyS_LiUidB1eY8f35I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

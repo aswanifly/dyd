@@ -16,6 +16,7 @@ import 'package:dyd/feature/lucky-card/screen/lucky_card_screen.dart';
 import 'package:dyd/feature/order/widget/order_summary_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/widget/loader/circular_progress_loader.dart';
 import '../controller/discount_card_controller.dart';
@@ -248,7 +249,10 @@ class _DiscountCardListScreenState extends State<DiscountCardListScreen> {
                 buildCardDetailWidget(
                     "Discount Coupon no.", discount.bookingId ?? "N/A"),
                 buildCardDetailWidget(
-                    "Exp. date", discount.discountCardDetails.endDate),
+                    "Exp. date",
+                    DateFormat('MMM dd, yyyy').format(DateTime.parse(discount
+                        .discountCardDetails.endDate
+                        .toIso8601String()))),
                 // buildCardDetailWidget(
                 //     "Exp. time", discount.expiryTime ?? "10:00PM"),
                 // const SizedBox(height: 10),

@@ -53,7 +53,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
           children: [
             CSearchBar(
               onChanged: (String value) {
-                productController.filterProductByName(value);
+                selectedCategoryId.isEmpty
+                    ? productController.filterAllProductByName(value)
+                    : productController.filterProductByName(value);
               },
               controller: productController.searchFilter,
             ),

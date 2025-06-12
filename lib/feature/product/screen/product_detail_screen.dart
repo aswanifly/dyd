@@ -18,6 +18,7 @@ import 'package:dyd/core/typo/red_typo.dart';
 import 'package:dyd/core/typo/white_typo.dart';
 import 'package:dyd/core/widget/button-widget/c_gradient_material_button_widget.dart';
 import 'package:dyd/core/widget/button-widget/c_material_button_widget.dart';
+import 'package:dyd/core/widget/custom_dailog/show_discount_card_dialog.dart';
 import 'package:dyd/core/widget/image-widget/c_circular_cached_image_widget.dart';
 import 'package:dyd/feature/cart/screen/cart_screen.dart';
 import 'package:dyd/feature/lucky-card/controller/discount_card_controller.dart';
@@ -95,9 +96,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          productDetailModel.images.isEmpty
-              ? Text("data")
-              : buildCarouselSliderWidget(context, productDetailModel.images),
+          buildCarouselSliderWidget(context, productDetailModel.images),
           Spacing.verticalSpace(10),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -414,7 +413,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               productController.kProductDetailModel(updatedModel);
               productController.fAddProductToCart();
             } else {
-              Get.to(() => DiscountCardListScreen());
+              showDiscountCardDialog(context);
             }
           },
         ),
@@ -490,7 +489,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             if (isActive) {
               productController.fAddProductToCart();
             } else {
-              Get.to(() => DiscountCardListScreen());
+              showDiscountCardDialog(context);
             }
           },
         ),
@@ -509,9 +508,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           CNetworkImageRectangularWithTextWidget(
             imageLink: relatedProducts.image!.isEmpty
-                ? 'https://cdn.pixabay.com/photo/2022/06/21/21/15/audio-7276511_1280.jpg'
-                : "$IMAGE_URL${relatedProducts.image!}",
-            name: "",
+                ? ''
+                : "$IMAGE_URL${relatedProducts.image![0]}",
+            name: relatedProducts.productName!,
             height: 130,
             width: 130,
             borderRadius: BorderRadius.circular(8),
@@ -603,7 +602,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   // }
 
   //carousel slider widget
-  Stack buildCarouselSliderWidget(BuildContext context, List<String> images) {
+  Stack buildCarouselSliderWidget(BuildContext context, List<String>? images) {
+    // Check if images is null or empty
+    if (images == null ||
+        images.isEmpty ||
+        images.every((image) => image.isEmpty)) {
+      return Stack(
+        children: [
+          SizedBox(
+            height: context.dynamicHeight(0.4),
+            width: double.infinity,
+            child: Center(
+              child: Text(
+                "No Images",
+                style: TypoBlack.black50014,
+              ),
+            ),
+          ),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: AppPalette.white,
+              child: Icon(
+                Icons.share_outlined,
+                color: AppPalette.black,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // If images are available, render the carousel
     return Stack(
       children: [
         SizedBox(
@@ -617,7 +650,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               height: double.infinity,
               width: double.infinity,
               fit: BoxFit.cover,
-              imageUrl: "$IMAGE_URL${images[itemIndex]}",
+              imageUrl: images[itemIndex].isEmpty
+                  ? 'https://cdn.pixabay.com/photo/2025/03/29/10/59/ryoan-ji-9500830_1280.jpg'
+                  : "$IMAGE_URL${images[itemIndex]}",
+              placeholder: (context, url) => Center(
+                child: CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) => Center(
+                child: Text(
+                  "No Images",
+                  style: TypoBlack.black50014,
+                ),
+              ),
             ),
             options: CarouselOptions(
               autoPlay: false,
@@ -632,14 +676,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           top: 10,
           right: 10,
           child: CircleAvatar(
-              radius: 18,
-              backgroundColor: AppPalette.white,
-              child: Icon(
-                Icons.share_outlined,
-                color: AppPalette.black,
-                size: 20,
-              )),
-        )
+            radius: 18,
+            backgroundColor: AppPalette.white,
+            child: Icon(
+              Icons.share_outlined,
+              color: AppPalette.black,
+              size: 20,
+            ),
+          ),
+        ),
       ],
     );
   }

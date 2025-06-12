@@ -2,6 +2,8 @@ import 'package:dyd/core/constant/app-loading-state/app_loading_status.dart';
 import 'package:dyd/core/helper/error_helper.dart';
 import 'package:dyd/core/widget/snackbar/getx_snackbar_widget.dart';
 import 'package:dyd/feature/cart/screen/cart_screen.dart';
+import 'package:dyd/feature/landing/controller/landing_controller.dart';
+import 'package:dyd/feature/landing/screen/landing_screen.dart';
 import 'package:dyd/model/address-model/address_model.dart';
 import 'package:dyd/repo/address-repo/address_repo.dart';
 import 'package:dyd/repo/google-repo/google_repo.dart';
@@ -690,9 +692,15 @@ class AddressViewModel extends GetxController {
       // );
       kOverLayAddressLoadingStatus(Status.success);
       fGetAddedAddress();
-      Get.off(CartScreen());
+
       if (context.mounted) {
         showCustomSnackBar(context, response.response["message"]);
+        Get.offAll(() => NavigationScreen(
+              showSplash: false,
+            ));
+
+        Get.find<LandingController>().kCurrentScreenIndex(2);
+
         // SnackBarUtil.showCustomSnackBar(
         //     context: context,
         //     message: response.response["message"],

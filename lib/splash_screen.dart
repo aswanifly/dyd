@@ -42,7 +42,10 @@ class _SplashScreenState extends State<SplashScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset(ImageHelper.appLogoPNG),
+          Image.asset(
+            ImageHelper.appLogo,
+            height: 100,
+          ),
           Spacing.verticalSpace(10),
           Text(
             "Win Big Today!",

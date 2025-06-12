@@ -58,7 +58,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     context.verticalSpacing(0.08),
-                    Image.asset(ImageHelper.appLogoPNG),
+                    Image.asset(
+                      ImageHelper.appLogo,
+                      height: 100,
+                    ),
                     Spacing.verticalSpace(10),
                     Text(
                       "Win Big Today!",

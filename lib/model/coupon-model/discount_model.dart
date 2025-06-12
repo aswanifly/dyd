@@ -42,7 +42,7 @@ class DiscountCardDetails {
   final int discountPercent;
   final String price;
   final String status;
-  final String endDate;
+  final DateTime? endDate;
   final int validityInDays;
   final bool isSelectedForUser;
   final String createdAt;
@@ -74,7 +74,8 @@ class DiscountCardDetails {
       discountPercent: json['discountPercent'] ?? 0,
       price: json['price'].toString() ?? "0",
       status: json['status'] ?? '',
-      endDate: json['endDate'] ?? '',
+      endDate:
+          json['endDate'] != null ? DateTime.tryParse(json['endDate']) : null,
       validityInDays: json['validityInDays'] ?? 0,
       isSelectedForUser: json['isSelectedForUser'] ?? false,
       createdAt: json['createdAt'] ?? '',

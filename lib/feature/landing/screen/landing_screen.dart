@@ -82,7 +82,8 @@ class LandingScreen extends StatelessWidget {
 }
 
 class NavigationScreen extends StatefulWidget {
-  const NavigationScreen({super.key});
+  final bool showSplash;
+  const NavigationScreen({super.key, this.showSplash = true});
 
   @override
   State<NavigationScreen> createState() => _NavigationScreenState();
@@ -105,31 +106,35 @@ class _NavigationScreenState extends State<NavigationScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showGeneralDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierColor: Colors.transparent,
-        // transitionDuration: Duration(seconds: 5),
-        pageBuilder: (context, anim1, anim2) {
-          return Center(
-            child: Image.asset(
-              'assets/vedios/imluckyhandshake-ezgif.com-resize.gif',
-              width: 300,
-              height: 300,
-              fit: BoxFit.cover,
-            ),
-          );
-        },
-      );
+    if (widget.showSplash) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(Duration(milliseconds: 200), () {
+          if (!mounted) return;
 
-      // Auto-close the popup after 5 seconds
-      Future.delayed(Duration(seconds: 1), () {
-        if (mounted && Navigator.canPop(context)) {
-          Navigator.of(context).pop();
-        }
+          showGeneralDialog(
+            context: context,
+            barrierDismissible: false,
+            barrierColor: Colors.transparent,
+            pageBuilder: (context, anim1, anim2) {
+              return Center(
+                child: Image.asset(
+                  ImageHelper.splashHandshake,
+                  width: 300,
+                  height: 300,
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          );
+
+          Future.delayed(Duration(seconds: 1), () {
+            if (mounted && Navigator.of(context).canPop()) {
+              Navigator.of(context).pop(); // Close the dialog
+            }
+          });
+        });
       });
-    });
+    }
   }
 
   @override

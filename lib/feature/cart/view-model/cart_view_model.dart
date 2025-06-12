@@ -34,6 +34,7 @@ class CartViewModel extends GetxController {
   RxString wishListCount = ''.obs;
   RxString discountCount = ''.obs;
   RxString addressId = "".obs;
+  final quantities = <String, RxInt>{}.obs;
   RxInt purchaseQuantity = 1.obs;
   Rx<ProfileCountsModel?> profileCountsModel = Rx(null);
 
@@ -41,6 +42,28 @@ class CartViewModel extends GetxController {
 
   RxList<CartItem> cartItem = <CartItem>[].obs;
   Rx<TrackOrderModel?> trackOrderModel = Rx(null);
+
+  void initializeQuantities() {
+    for (var item in cartItem) {
+      quantities[item.id] = RxInt(item.purchaseQuantity);
+    }
+  }
+
+  void increaseQuantity(String itemId) {
+    if (quantities.containsKey(itemId)) {
+      quantities[itemId]!.value++;
+    }
+  }
+
+  void decreaseQuantity(String itemId) {
+    if (quantities.containsKey(itemId) && quantities[itemId]!.value > 1) {
+      quantities[itemId]!.value--;
+    }
+  }
+
+  int getQuantity(String itemId) {
+    return quantities[itemId]?.value ?? 1;
+  }
 
   Future<void> fGetCartItems() async {
     try {

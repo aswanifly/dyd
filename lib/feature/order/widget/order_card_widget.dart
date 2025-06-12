@@ -1,5 +1,6 @@
 import 'package:dyd/core/constant/app_constant.dart';
 import 'package:dyd/core/widget/button-widget/c_gradient_material_button_widget.dart';
+import 'package:dyd/core/widget/custom_dailog/show_discount_card_dialog.dart';
 import 'package:dyd/feature/lucky-card/controller/discount_card_controller.dart';
 import 'package:dyd/feature/lucky-card/screen/discount_cards_list_screen.dart';
 import 'package:dyd/feature/order/screen/track_order_screen.dart';
@@ -176,7 +177,7 @@ class OrderCardWidget extends StatelessWidget {
                               //   basePrice: product.basePrice,
                               // );
                             } else {
-                              Get.to(() => DiscountCardListScreen());
+                              showDiscountCardDialog(context);
                             }
                           },
                         ),

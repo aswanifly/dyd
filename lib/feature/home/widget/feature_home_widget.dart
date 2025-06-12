@@ -1,3 +1,4 @@
+import 'package:dyd/core/config/asset-image-path/asset_image_path.dart';
 import 'package:dyd/core/config/navigation-helper/navigation_helper.dart';
 import 'package:dyd/core/config/spacing/static_spacing_helper.dart';
 import 'package:dyd/core/config/theme/app_palette.dart';
@@ -8,6 +9,7 @@ import 'package:dyd/core/typo/green_typo.dart';
 import 'package:dyd/core/typo/light_grey_typo.dart';
 import 'package:dyd/core/typo/red_typo.dart';
 import 'package:dyd/core/widget/button-widget/c_material_button_widget.dart';
+import 'package:dyd/core/widget/custom_dailog/show_discount_card_dialog.dart';
 import 'package:dyd/core/widget/image-widget/cached_network_image.dart';
 import 'package:dyd/feature/home/controller/home_controller.dart';
 import 'package:dyd/feature/home/widget/featured_product_card_widget.dart';
@@ -40,6 +42,17 @@ class _FeatureHomeWidgetState extends State<FeatureHomeWidget> {
     super.initState();
   }
 
+  ButtonStyle buildCommonButtonStyle(
+      {required Color bgColor, required Color fgColor}) {
+    return ElevatedButton.styleFrom(
+      minimumSize: const Size(double.infinity, 48),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      backgroundColor: bgColor,
+      foregroundColor: fgColor,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -49,7 +62,6 @@ class _FeatureHomeWidgetState extends State<FeatureHomeWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Featured Products", style: TypoBlack.black70018),
-              //show view all only when the category list is not 0(zero)
               productController.kAllProductList.isEmpty
                   ? SizedBox()
                   : InkWell(
@@ -126,7 +138,8 @@ class _FeatureHomeWidgetState extends State<FeatureHomeWidget> {
                               height: 144,
                               width: double.infinity,
                               child: CCachedNetworkImage(
-                                imageLink: product.images.isEmpty
+                                imageLink: product.images.isEmpty ||
+                                        product.images[0].isEmpty
                                     ? ""
                                     : "$IMAGE_URL${product.images.first}",
                                 fit: BoxFit.cover,
@@ -137,13 +150,10 @@ class _FeatureHomeWidgetState extends State<FeatureHomeWidget> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 10),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  product.productName,
-                                  style: TypoBlack.black60016,
-                                ),
+                                Text(product.productName,
+                                    style: TypoBlack.black60016),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -188,8 +198,7 @@ class _FeatureHomeWidgetState extends State<FeatureHomeWidget> {
                                             basePrice: product.basePrice,
                                           );
                                         } else {
-                                          Get.to(
-                                              () => DiscountCardListScreen());
+                                          showDiscountCardDialog(context);
                                         }
                                       },
                                     ),

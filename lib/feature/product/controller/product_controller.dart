@@ -37,6 +37,7 @@ class ProductController extends GetxController {
   RxList<ProductModel> kProductList = <ProductModel>[].obs;
   RxList<ProductModel> originalProductList = <ProductModel>[].obs;
   RxList<AllProductModel> kAllProductList = <AllProductModel>[].obs;
+  RxList<AllProductModel> kAllProductSearchList = <AllProductModel>[].obs;
   RxList<WishListProductModel> kWishList = <WishListProductModel>[].obs;
   RxString productsearch = ''.obs;
   TextEditingController searchFilter = TextEditingController();
@@ -97,6 +98,18 @@ class ProductController extends GetxController {
     }
   }
 
+  void filterAllProductByName(String query) {
+    if (query.trim().isEmpty) {
+      kAllProductList.assignAll(kAllProductSearchList);
+    } else {
+      kAllProductList.assignAll(
+        kAllProductSearchList.where(
+          (p) => p.productName.toLowerCase().contains(query.toLowerCase()),
+        ),
+      );
+    }
+  }
+
   Future<void> fGetAllProductsList() async {
     try {
       Map<String, dynamic> data = {
@@ -106,6 +119,7 @@ class ProductController extends GetxController {
       };
       kProductListLoading(Status.loading);
       final res = await ProductRepo.fGetAllProducts(data);
+      kAllProductSearchList.assignAll(res);
       kAllProductList.clear();
       kAllProductList.addAll(res);
 
@@ -213,12 +227,10 @@ class ProductController extends GetxController {
 
       SnackBarGetXUtils.show(message: res.response["message"]);
       if (res.response["message"] == "Item added to cart successfully") {
-        Get.offAll(() => NavigationScreen());
+        Get.offAll(() => NavigationScreen(
+              showSplash: false,
+            ));
         Get.find<LandingController>().kCurrentScreenIndex(2);
-
-        // Future.delayed(Duration(milliseconds: 300), () {
-        //   Get.find<LandingController>().kCurrentScreenIndex(2);
-        // });
       } else {
         return;
       }
